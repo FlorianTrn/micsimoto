@@ -32,6 +32,7 @@ jobs:
       BDD_NAME: test
       BDD_USER: test
       BDD_PASS: test
+      FIRST_ADMIN_PASSWORD: nimda
 
     steps:
       - name: Checkout
