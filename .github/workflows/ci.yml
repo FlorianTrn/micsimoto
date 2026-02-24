@@ -2,7 +2,7 @@ name: INTEGRATION
 
 on:
   push:
-    Branches: [ develop ]
+    branches: [ develop ]
 
 jobs:
   Backend:
@@ -13,7 +13,7 @@ jobs:
 
     services:
       mariadb:
-        images: mariadb:12.1.2
+        image: mariadb:10.6
         env:
           MARIADB_ROOT_PASSWORD: toor
           MARIADB_DATABASE: test
@@ -23,7 +23,7 @@ jobs:
           - 3306:3306
 
     env:
-      BDD_HDST: 127.0.0.1
+      BDD_HOST: 127.0.0.1
       BDD_NAME: test
       BDD_USER: test
       BDD_PASS: test
@@ -40,17 +40,17 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-versions: '20.x'
+          node-version: '20.x'
 
       - name: Install Dep
-        run: npm 1
+        run: npm install
 
       - name: Init and Populate BDD
         run: |
           npm run initbdd
           npm run Populate
 
-      - name: Run test and covorage
+      - name: Run test and coverage
         run: npm run test:cov
 
       - name: Upload Coverage report
@@ -61,11 +61,11 @@ jobs:
           retention-days: 1
 
   Frontend:
-    needs: [backend]
+    needs: [Backend]
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: Frontend
+        working-directory: frontend
 
     steps:
       - name: Checkout
@@ -77,7 +77,7 @@ jobs:
           docker compose -f docker-compose-back-build.yml up -d
           docker ps -a
 
-      - name: Wait for Backendto be ready
+      - name: Wait for Backend to be ready
         uses: jakejarvis/wait-action@master
         with:
           time: '10s'
@@ -89,25 +89,25 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-versions: '20.x'
+          node-version: '20.x'
 
       - name: Cypress E2E Install
         uses: cypress-io/github-action@v6
         with:
-          runTest: false
-          working-directory: Frontend
+          runTests: false
+          working-directory: frontend
 
       - name: Install Dep
-        run: npm 1
+        run: npm install
 
-      - name: Cypress E2E Install
+      - name: Cypress E2E Run
         uses: cypress-io/github-action@v6
         with:
-          Install: false
+          install: false
           start: npm run dev
-          working-directory: Frontend
+          working-directory: frontend
 
-      - name: Generate Coverage repport
+      - name: Generate Coverage report
         run: npm run cypress:cov
 
       - name: Upload Cy Screen
