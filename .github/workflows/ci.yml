@@ -53,7 +53,7 @@ jobs:
       - name: Init and Populate BDD
         run: |
           npm run initbdd
-          npm run Populate
+          npm run populate
 
       - name: Run test and coverage
         run: npm run test:cov
